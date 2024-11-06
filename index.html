@@ -1,0 +1,113 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <title>Système multi-agents</title>
+    <style>
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+      .fade-out {
+        animation: fadeOut 1s forwards; /* 1 second duration */
+      }
+    </style>
+  </head>
+  <body class="flex flex-col justify-between gap-[10px]">
+    <!-- Différents boutons de l'application -->
+    <div class="flex flex-col gap-[10px] mb-[20px]">
+      <!-- Bouttons du haut -->
+      <div class="flex justify-between items-center">
+        <div
+          class="flex flex-col gap-[5px] items-center bg-[#4d4d4d] w-[250px] py-[15px] rounded-md"
+        >
+          <label for="size" class="flex gap-[7px] items-center"
+            ><i class="fas fa-arrows-alt-v"></i> Taille des agents</label
+          >
+          <input
+            type="range"
+            id="sizeButton"
+            name="size"
+            min="1"
+            max="100"
+            value="50"
+            class="cursor-pointer"
+          />
+        </div>
+
+        <button
+          id="startButton"
+          class="bg-[#b3b3b3] text-[#333333] px-[25px] h-[40px] rounded-md font-bold transition-all duration-300 hover:bg-[#cecdcd]"
+        >
+          Lancer la simulation
+        </button>
+
+        <div
+          class="flex flex-col gap-[5px] items-center bg-[#4d4d4d] w-[250px] py-[15px] rounded-md"
+        >
+          <label for="speed" class="flex gap-[7px] items-center"
+            ><i class="fa fa-tachometer" aria-hidden="true"></i> Vitesse des
+            agents</label
+          >
+          <input
+            type="range"
+            id="speedButton"
+            name="speed"
+            min="1"
+            max="100"
+            value="50"
+            class="cursor-pointer"
+          />
+        </div>
+      </div>
+
+      <!-- Bouttons du bas -->
+      <div class="self-center flex items-center gap-[15px]">
+        <button
+          id="restoreButton"
+          class="bg-[#b3b3b3] text-[#333333] px-[25px] h-[40px] rounded-md font-bold transition-all duration-300 hover:bg-[#cecdcd]"
+        >
+          Restaurer
+        </button>
+        <button
+          id="pauseResumeButton"
+          class="bg-[#2B7621] text-white px-[25px] h-[40px] rounded-md font-bold transition-all duration-300 hover:bg-[#226119]"
+        >
+          Mettre en pause
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="modal"
+      class="absolute top-0 right-0 left-0 flex justify-center hidden pointer-events-none"
+    >
+      <div
+        class="bg-black mt-[30px] px-[50px] py-[20px] rounded-md shadow-lg flex flex-col items-center font-bold"
+      >
+        <h2 class="text-red-400 text-xl font-bold">Alerte d'infection</h2>
+        <p class="text-white mt-2 text-base">
+          Agent <span class="underline" id="infectionMessage"></span> a été contaminé!
+        </p>
+      </div>
+    </div>
+
+    <div id="canvasParent" class="flex-1">
+      <canvas id="gameCanvas" style="display: none"></canvas>
+    </div>
+  </body>
+  <script type="module" src="scripts/index.js"></script>
+</html>
