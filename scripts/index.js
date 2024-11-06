@@ -1,5 +1,8 @@
 /** @format */
 import Agent from "./Agent.js";
+import MoveBehavior from "./MoveBehavior.js";
+import DrawPerson from "./DrawPerson.js";
+import DrawVirus from "./DrawVirus.js";
 
 /**
  * Calculates a value between min and max based on a percentage
@@ -44,8 +47,10 @@ const restoreButton = document.getElementById("restoreButton");
 const pauseResumeButton = document.getElementById("pauseResumeButton");
 const sizeButton = document.getElementById("sizeButton");
 const speedButton = document.getElementById("speedButton");
+const restartButton = document.getElementById("restartButton");
 const modal = document.getElementById("modal");
 const infectionMessage = document.getElementById("infectionMessage");
+const modalFinish = document.getElementById("modalFinish");
 let timeoutInfectionMessage;
 
 // Get canvas elements and set up context
@@ -59,6 +64,7 @@ const ctx = gameCanvas.getContext("2d");
 let intervalAnimation = null;
 var agents = [];
 let actualState = null;
+var virus = [];
 
 // Constants for agent size and speed ranges
 const minSize = 5;
@@ -85,35 +91,50 @@ InitCanvas();
 // Function to hide the modal
 const hideModal = () => {
   modal.classList.add("fade-out");
-  setTimeout(() => {
-    modal.classList.add("hidden");
-  }, 1000);
+};
+
+// Function to display the modal
+const displayModal = () => {
+  if (modal.classList.contains("hidden")) {
+    modal.classList.remove("hidden");
+  }
+  modal.classList.remove("fade-out");
+};
+
+// Function to display the modalFinish
+const displayModalFinish = () => {
+  modalFinish.classList.remove("hidden");
+  modalFinish.classList.remove("fade-out");
+};
+
+// Function to display the modalFinish
+const hideModalFinish = () => {
+  modalFinish.classList.add("hidden");
+  modalFinish.classList.add("fade-out");
 };
 
 // Event for infect agent
 document.addEventListener("agentInfected", (event) => {
-  console.log(event.detail);
   const infectedName = event.detail;
   infectionMessage.textContent = `${infectedName}`;
-  displayModal();
-  
+
   if (timeoutInfectionMessage) {
     clearTimeout(timeoutInfectionMessage);
-    timeoutInfectionMessage = setTimeout(() => {
-      hideModal();
-    }, 2000);
-  } else {
-    timeoutInfectionMessage = setTimeout(() => {
-      hideModal();
-    }, 2000);
   }
+
+  displayModal();
+
+  timeoutInfectionMessage = setTimeout(() => {
+    hideModal();
+  }, 2000);
 });
 
-// Function to hide the modal
-const displayModal = () => {
-  modal.classList.remove("hidden");
-  modal.classList.remove("fade-out");
-};
+document.addEventListener("finishSimulation", () => {
+  clearInterval(intervalAnimation);
+  intervalAnimation = null;
+  animateEnvironments(true);
+  displayModalFinish();
+});
 
 /**
  * Start animation when start button clicked, if not paused
@@ -128,6 +149,11 @@ startButton.addEventListener("click", () => {
  * Reset simulation when restore button clicked
  */
 restoreButton.addEventListener("click", () => {
+  restore();
+});
+
+restartButton.addEventListener("click", () => {
+  hideModalFinish();
   restore();
 });
 
@@ -185,44 +211,90 @@ const changeSize = (size) => {
  * Create initial environment with 50 agents, one infected
  */
 const createEnvironnement = async () => {
-  let i = 0;
-  let agent;
   const agentsArray = Object.entries(agentsNameAndImages);
 
-  while (i < agentsArray.length) {
+  // Création personne
+  for (let i = 0; i < agentsArray.length; i++) {
     try {
-      agent = await new Agent(
-        canvasWidth,
-        canvasHeight,
-        size,
-        agentsArray[i][1],
-        agentsArray[i][0]
-      );
-      if (i === 14) {
-        agent.infectAgent();
-      }
+      const config = {
+        canvasWidth: canvasWidth,
+        canvasHeight: canvasHeight,
+        radius: size,
+        behaviors: {
+          move: new MoveBehavior(5, [
+            "top",
+            "top-left",
+            "left",
+            "bottom-left",
+            "bottom",
+            "bottom-right",
+            "right",
+            "top-right",
+          ]),
+          drawAgent: new DrawPerson(),
+        },
+      };
+
+      const agent = await new Agent({
+        ...config,
+        imgSrc: agentsArray[i][1],
+        name: agentsArray[i][0],
+      });
       agents.push(agent);
-      agent.draw(ctx); // Draw the agent after it has been created
-      i++;
+      agent.draw(ctx);
     } catch (error) {
-      console.error("Error creating agent:", error);
+      console.error("Erreur lors de la création de l'agent :", error);
+    }
+  }
+
+  for (let i = 0; i < 3; i++) {
+    try {
+      const config = {
+        canvasWidth: canvasWidth,
+        canvasHeight: canvasHeight,
+        radius: size,
+        state: "virus",
+        behaviors: {
+          drawAgent: new DrawVirus(),
+        },
+      };
+
+      const agent = await new Agent({
+        ...config,
+        imgSrc: "../images/virus.png",
+        name: `Virus ${i}`,
+      });
+      agent.draw(ctx);
+      virus.push(agent);
+    } catch (error) {
+      console.error("Erreur lors de la création de l'agent :", error);
     }
   }
 };
 
 createEnvironnement();
 
+document.addEventListener("removeVirus", (event) => {
+  const id = event.detail;
+  virus = virus.filter((virus) => virus.id !== id);
+});
+
 /**
  * Animation loop - updates and redraws all agents
  */
-const animateEnvironments = () => {
+const animateEnvironments = (last) => {
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
   agents.forEach((agent) => {
     if (agent.state == "infected") {
       agent.isColliding(agents);
     }
-    agent.run();
+    agent.run(last);
+    agent.draw(ctx);
+  });
+
+  virus.forEach((agent) => {
+    agent.isColliding(agents);
     agent.draw(ctx);
   });
 };
@@ -243,18 +315,12 @@ const runAnimation = () => {
  * Reset the simulation to initial state
  */
 const restore = () => {
-  // Clear the canvas
+  // Clear the canvas and animations
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   clearInterval(intervalAnimation);
-
-  // Reset values of buttons
-  sizeButton.value = 50;
-  size = calculConversion(minSize, maxSize, 50);
-  speedButton.value = 50;
-  speed = calculConversion(minSpeed, maxSpeed, 50);
+  intervalAnimation = null;
 
   // Reset state variables
-  intervalAnimation = null;
   agents.length = 0;
   actualState = null;
   Agent.restoreAgent();

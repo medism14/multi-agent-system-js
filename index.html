@@ -100,8 +100,26 @@
       >
         <h2 class="text-red-400 text-xl font-bold">Alerte d'infection</h2>
         <p class="text-white mt-2 text-base">
-          Agent <span class="underline" id="infectionMessage"></span> a été contaminé!
+          Agent <span class="underline" id="infectionMessage"></span> a été
+          contaminé(e)!
         </p>
+      </div>
+    </div>
+
+    <div
+      id="modalFinish"
+      class="absolute top-0 right-0 left-0 flex justify-center hidden"
+    >
+      <div
+        class="bg-black mt-[30px] px-[50px] py-[20px] rounded-md shadow-lg flex flex-col items-center font-bold border-2 border-white"
+      >
+        <h2 class="text-white text-xl font-bold">La simulation est terminée tout les joueurs sont infectés</h2>
+        <button
+          id="restartButton"
+          class="bg-[#2B7621] text-white px-[25px] h-[40px] rounded-md font-bold transition-all duration-300 hover:bg-[#226119] mt-[20px]"
+        >
+          Relancer
+        </button>
       </div>
     </div>
 

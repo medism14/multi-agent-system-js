@@ -6,50 +6,38 @@
 class Agent {
   #id; // Unique identifier for each agent
   #name; // Name of the agent
-  #state = "normal"; // Current state of agent (normal or infected)
+  #state; // Current state of agent (normal or infected or virus)
   #positionX; // X coordinate on canvas
   #positionY; // Y coordinate on canvas
   #canvasWidth; // Width of canvas agent moves in
   #canvasHeight; // Height of canvas agent moves in
   #radius; // Size of the agent
-  #moveDirection = "top-left"; // Current movement direction
-  #directions = [
-    "top",
-    "top-left",
-    "left",
-    "bottom-left",
-    "bottom",
-    "bottom-right",
-    "right",
-    "top-right",
-  ]; // Possible movement directions
-  #directionIteration = 2; // How many moves to make in current direction
-  #speed = 5; // Movement speed
   static #numberOfAgents = 0; // Counter for total agents created
   static #numberOfAgentsInfected = 0; // Counter for total agents created
   #img; // Img of the agent
+  #behaviors = [];
+
   /**
    * Create a new agent
    * @param {number} canvasWidth - Width of canvas
    * @param {number} canvasHeight - Height of canvas
    * @param {number} radius - Size of agent
    */
-  constructor(canvasWidth, canvasHeight, radius, imgSrc, name) {
+  constructor(config) {
     this.#id = ++Agent.#numberOfAgents;
-    this.#canvasWidth = canvasWidth;
-    this.#canvasHeight = canvasHeight;
-    this.#radius = radius;
-    this.#positionX = this.getRandomX(canvasWidth);
-    this.#positionY = this.getRandomY(canvasHeight);
-    this.#name = name;
-
-    // Set random initial direction
-    const random = Math.floor(Math.random() * this.#directions.length);
-    this.#moveDirection = this.#directions[random];
+    this.#canvasWidth = config.canvasWidth;
+    this.#canvasHeight = config.canvasHeight;
+    this.#radius = config.radius;
+    this.#positionX = this.getRandomX(config.canvasWidth);
+    this.#positionY = this.getRandomY(config.canvasHeight);
+    this.#name = config.name;
+    this.#state = config.state ?? "normal";
 
     // Load the image for the agent
     this.#img = new Image();
-    this.#img.src = imgSrc;
+    this.#img.src = config.imgSrc;
+
+    this.#behaviors = config.behaviors;
 
     // Return a Promise that resolves when the image is loaded
     return new Promise((resolve, reject) => {
@@ -63,42 +51,14 @@ class Agent {
    * @param {CanvasRenderingContext2D} ctx - Canvas context
    */
   draw(ctx) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(this.#positionX, this.#positionY, this.#radius, 0, Math.PI * 2);
-    ctx.clip();
-
-    ctx.drawImage(
+    this.#behaviors.drawAgent.draw(
+      ctx,
+      this.#positionX,
+      this.#positionY,
+      this.#radius,
       this.#img,
-      this.#positionX - this.#radius,
-      this.#positionY - this.#radius,
-      this.#radius * 2,
-      this.#radius * 2
+      this.#state
     );
-
-    if (this.#state == "infected") {
-      ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
-      ctx.fill();
-    }
-
-    ctx.strokeStyle = this.#state === "normal" ? "#A9A9A9" : "#B3171C";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  /**
-   * Update agent position based on movement direction
-   */
-  run() {
-    if (Agent.#numberOfAgentsInfected >= 23) {
-      console.log("Tout le monde est infecté");
-    }
-
-    const { moveX, moveY } = this.getRandomMove();
-    this.#positionX += moveX;
-    this.#positionY += moveY;
   }
 
   /**
@@ -117,6 +77,12 @@ class Agent {
         agent.state == "normal"
       ) {
         agent.infectAgent();
+        if (this.#state == "virus") {
+          const event = new CustomEvent("removeVirus", {
+            detail: this.#id,
+          });
+          document.dispatchEvent(event);
+        }
       }
     });
   }
@@ -138,195 +104,29 @@ class Agent {
    * @returns {Object} Object containing X and Y movement values
    */
 
-  getRandomMove() {
-    let moveX = 0;
-    let moveY = 0;
-    let randomBorderChangeDirection = Math.floor(Math.random() * 6 - 2) + 2;
-    let directionChange = "";
+  /**
+   * Update agent position based on movement direction
+   */
 
-    // Check if we should change direction
-    if (this.#directionIteration == 0) {
-      let randomValue = Math.floor(Math.random() * 6 - 2) + 2;
-      this.#directionIteration = randomValue;
+  run(last) {
+    if (this.#behaviors.move) {
+      if (Agent.#numberOfAgentsInfected >= 23 && !last) {
+        const event = new CustomEvent("finishSimulation");
+        document.dispatchEvent(event);
+      }
 
-      let randomForDirection = Math.floor(
-        Math.random() * this.#directions.length
+      // Le problème est ici - behaviors n'est pas un objet avec getRandomMove
+      const { moveX, moveY } = this.#behaviors.move.getRandomMove(
+        this.#positionX,
+        this.#positionY,
+        this.#radius,
+        this.#canvasWidth,
+        this.#canvasHeight
       );
-      this.#moveDirection = this.#directions[randomForDirection];
-    } else {
-      this.#directionIteration--;
+
+      this.#positionX += moveX;
+      this.#positionY += moveY;
     }
-
-    // Calculate movement based on direction and boundaries
-    switch (this.#moveDirection) {
-      case "top":
-        if (this.#positionY <= this.#radius + this.#speed * 2) {
-          moveY += this.#speed;
-          directionChange = "bottom";
-        } else {
-          moveY -= this.#speed;
-        }
-
-        if (directionChange) {
-          this.#moveDirection = directionChange;
-          this.#directionIteration = randomBorderChangeDirection;
-        }
-        break;
-      case "top-left":
-        if (this.#positionY <= this.#radius + this.#speed * 2) {
-          moveY += this.#speed;
-          directionChange = "bottom";
-        } else {
-          moveY -= this.#speed;
-        }
-
-        if (this.#positionX <= this.#radius + this.#speed * 2) {
-          moveX += this.#speed;
-          if (directionChange) {
-            directionChange = "right";
-          } else {
-            directionChange = "-right";
-          }
-        } else {
-          moveX -= this.#speed;
-        }
-        if (directionChange) {
-          this.#moveDirection = directionChange;
-          this.#directionIteration = randomBorderChangeDirection;
-        }
-        break;
-      case "left":
-        if (this.#positionX <= this.#radius + this.#speed * 2) {
-          moveX += this.#speed;
-          directionChange = "right";
-        } else {
-          moveX -= this.#speed;
-        }
-
-        if (directionChange) {
-          this.#moveDirection = directionChange;
-          this.#directionIteration = randomBorderChangeDirection;
-        }
-        break;
-      case "bottom-left":
-        if (
-          this.#positionY >=
-          this.#canvasHeight - this.#radius - this.#speed * 2
-        ) {
-          moveY -= this.#speed;
-          directionChange = "top";
-        } else {
-          moveY += this.#speed;
-        }
-
-        if (this.#positionX <= this.#radius + this.#speed * 2) {
-          moveX += this.#speed;
-          if (directionChange) {
-            directionChange = "right";
-          } else {
-            directionChange = "-right";
-          }
-        } else {
-          moveX -= this.#speed;
-        }
-
-        if (directionChange) {
-          this.#moveDirection = directionChange;
-          this.#directionIteration = randomBorderChangeDirection;
-        }
-        break;
-      case "bottom":
-        if (
-          this.#positionY >=
-          this.#canvasHeight - this.#radius - this.#speed * 2
-        ) {
-          moveY -= this.#speed;
-          directionChange = "top";
-        } else {
-          moveY += this.#speed;
-        }
-
-        if (directionChange) {
-          this.#moveDirection = directionChange;
-          this.#directionIteration = randomBorderChangeDirection;
-        }
-        break;
-      case "bottom-right":
-        if (
-          this.#positionY >=
-          this.#canvasHeight - this.#radius - this.#speed * 2
-        ) {
-          moveY -= this.#speed;
-          directionChange = "top";
-        } else {
-          moveY += this.#speed;
-        }
-
-        if (
-          this.#positionX >=
-          this.#canvasWidth - this.#radius - this.#speed * 2
-        ) {
-          moveX -= this.#speed;
-          if (directionChange) {
-            directionChange = "left";
-          } else {
-            directionChange = "-left";
-          }
-        } else {
-          moveX += this.#speed;
-        }
-
-        if (directionChange) {
-          this.#moveDirection = directionChange;
-          this.#directionIteration = randomBorderChangeDirection;
-        }
-        break;
-      case "right":
-        if (
-          this.#positionX >=
-          this.#canvasWidth - this.#radius - this.#speed * 2
-        ) {
-          moveX -= this.#speed;
-          directionChange = "left";
-        } else {
-          moveX += this.#speed;
-        }
-
-        if (directionChange) {
-          this.#moveDirection = directionChange;
-          this.#directionIteration = randomBorderChangeDirection;
-        }
-        break;
-      case "top-right":
-        if (this.#positionY <= this.#radius + this.#speed * 2) {
-          moveY += this.#speed;
-          directionChange = "bottom";
-        } else {
-          moveY -= this.#speed;
-        }
-
-        if (
-          this.#positionX >=
-          this.#canvasWidth - this.#radius - this.#speed * 2
-        ) {
-          moveX -= this.#speed;
-          if (directionChange) {
-            directionChange = "left";
-          } else {
-            directionChange = "-left";
-          }
-        } else {
-          moveX += this.#speed;
-        }
-
-        if (directionChange) {
-          this.#moveDirection = directionChange;
-          this.#directionIteration = randomBorderChangeDirection;
-        }
-        break;
-    }
-
-    return { moveX, moveY };
   }
 
   /**
@@ -354,23 +154,6 @@ class Agent {
       randomValue = this.#radius * 2;
     }
     return Math.floor(randomValue - this.#radius);
-  }
-
-  /**
-   * Get agent's current state information
-   * @returns {Object} Object containing agent properties
-   */
-  getInfoAgent() {
-    return {
-      id: this.#id,
-      state: this.#state,
-      position: {
-        x: this.#positionX,
-        y: this.#positionY,
-      },
-      radius: this.#radius,
-      moveDirection: this.#moveDirection,
-    };
   }
 
   static restoreAgent() {
@@ -407,22 +190,6 @@ class Agent {
     return this.#radius;
   }
 
-  get moveDirection() {
-    return this.#moveDirection;
-  }
-
-  get directions() {
-    return this.#directions;
-  }
-
-  get directionIteration() {
-    return this.#directionIteration;
-  }
-
-  get speed() {
-    return this.#speed;
-  }
-
   // Setters
   set state(newState) {
     this.#state = newState;
@@ -446,18 +213,6 @@ class Agent {
 
   set radius(newRadius) {
     this.#radius = newRadius;
-  }
-
-  set moveDirection(direction) {
-    this.#moveDirection = direction;
-  }
-
-  set directionIteration(iteration) {
-    this.#directionIteration = iteration;
-  }
-
-  set speed(newSpeed) {
-    this.#speed = newSpeed;
   }
 
   // Additional Getters
