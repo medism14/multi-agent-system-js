@@ -134,7 +134,7 @@ class Agent {
    * @param {number} canvasWidth - Width of canvas
    * @returns {number} Random X coordinate
    */
-  getRandomX(canvasWidth) {
+  getRandomX() {
     let randomValue = Math.random() * this.#canvasWidth;
     if (randomValue < this.#radius * 2) {
       randomValue = this.#radius * 2;
@@ -148,7 +148,7 @@ class Agent {
    * @param {number} canvasHeight - Height of canvas
    * @returns {number} Random Y coordinate
    */
-  getRandomY(canvasHeight) {
+  getRandomY() {
     let randomValue = Math.random() * this.#canvasHeight;
     if (randomValue < this.#radius * 2) {
       randomValue = this.#radius * 2;

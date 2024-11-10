@@ -205,6 +205,11 @@ const changeSize = (size) => {
     agent.radius = size;
     agent.draw(ctx);
   });
+
+  virus.forEach((agent) => {
+    agent.radius = size;
+    agent.draw(ctx);
+  });
 };
 
 /**

@@ -29,7 +29,7 @@ class MoveBehavior {
     let directionChange = "";
 
     // Check if we should change direction
-    if (this.#directionIteration == 0) {
+    if (this.#directionIteration <= 0) {
       let randomValue = Math.floor(Math.random() * 4) + 6;
       this.#directionIteration = randomValue;
 
@@ -45,10 +45,10 @@ class MoveBehavior {
     switch (this.#moveDirection) {
       case "top":
         if (positionY <= radius + this.#speed * 2) {
-          moveY += this.#speed;
+          moveY = this.#speed;
           directionChange = "bottom";
         } else {
-          moveY -= this.#speed;
+          moveY = -this.#speed;
         }
 
         if (directionChange) {
@@ -58,21 +58,17 @@ class MoveBehavior {
         break;
       case "top-left":
         if (positionY <= radius + this.#speed * 2) {
-          moveY += this.#speed;
+          moveY = this.#speed;
           directionChange = "bottom";
         } else {
-          moveY -= this.#speed;
+          moveY = -this.#speed;
         }
 
         if (positionX <= radius + this.#speed * 2) {
-          moveX += this.#speed;
-          if (directionChange) {
-            directionChange = "right";
-          } else {
-            directionChange = "-right";
-          }
+          moveX = this.#speed;
+          directionChange = directionChange ? "bottom-right" : "top-right";
         } else {
-          moveX -= this.#speed;
+          moveX = -this.#speed;
         }
         if (directionChange) {
           this.#moveDirection = directionChange;
@@ -81,10 +77,10 @@ class MoveBehavior {
         break;
       case "left":
         if (positionX <= radius + this.#speed * 2) {
-          moveX += this.#speed;
+          moveX = this.#speed;
           directionChange = "right";
         } else {
-          moveX -= this.#speed;
+          moveX = -this.#speed;
         }
 
         if (directionChange) {
@@ -94,21 +90,17 @@ class MoveBehavior {
         break;
       case "bottom-left":
         if (positionY >= canvasHeight - radius - this.#speed * 2) {
-          moveY -= this.#speed;
+          moveY = -this.#speed;
           directionChange = "top";
         } else {
-          moveY += this.#speed;
+          moveY = this.#speed;
         }
 
         if (positionX <= radius + this.#speed * 2) {
-          moveX += this.#speed;
-          if (directionChange) {
-            directionChange = "right";
-          } else {
-            directionChange = "-right";
-          }
+          moveX = this.#speed;
+          directionChange = directionChange ? "top-right" : "bottom-right";
         } else {
-          moveX -= this.#speed;
+          moveX = -this.#speed;
         }
 
         if (directionChange) {
@@ -118,10 +110,10 @@ class MoveBehavior {
         break;
       case "bottom":
         if (positionY >= canvasHeight - radius - this.#speed * 2) {
-          moveY -= this.#speed;
+          moveY = -this.#speed;
           directionChange = "top";
         } else {
-          moveY += this.#speed;
+          moveY = this.#speed;
         }
 
         if (directionChange) {
@@ -131,21 +123,17 @@ class MoveBehavior {
         break;
       case "bottom-right":
         if (positionY >= canvasHeight - radius - this.#speed * 2) {
-          moveY -= this.#speed;
+          moveY = -this.#speed;
           directionChange = "top";
         } else {
-          moveY += this.#speed;
+          moveY = this.#speed;
         }
 
         if (positionX >= canvasWidth - radius - this.#speed * 2) {
-          moveX -= this.#speed;
-          if (directionChange) {
-            directionChange = "left";
-          } else {
-            directionChange = "-left";
-          }
+          moveX = -this.#speed;
+          directionChange = directionChange ? "top-left" : "bottom-left";
         } else {
-          moveX += this.#speed;
+          moveX = this.#speed;
         }
 
         if (directionChange) {
@@ -155,10 +143,10 @@ class MoveBehavior {
         break;
       case "right":
         if (positionX >= canvasWidth - radius - this.#speed * 2) {
-          moveX -= this.#speed;
+          moveX = -this.#speed;
           directionChange = "left";
         } else {
-          moveX += this.#speed;
+          moveX = this.#speed;
         }
 
         if (directionChange) {
@@ -168,21 +156,17 @@ class MoveBehavior {
         break;
       case "top-right":
         if (positionY <= radius + this.#speed * 2) {
-          moveY += this.#speed;
+          moveY = this.#speed;
           directionChange = "bottom";
         } else {
-          moveY -= this.#speed;
+          moveY = -this.#speed;
         }
 
         if (positionX >= canvasWidth - radius - this.#speed * 2) {
-          moveX -= this.#speed;
-          if (directionChange) {
-            directionChange = "left";
-          } else {
-            directionChange = "-left";
-          }
+          moveX = -this.#speed;
+          directionChange = directionChange ? "bottom-left" : "top-left";
         } else {
-          moveX += this.#speed;
+          moveX = this.#speed;
         }
 
         if (directionChange) {
@@ -190,6 +174,12 @@ class MoveBehavior {
           this.#directionIteration = randomBorderChangeDirection;
         }
         break;
+    }
+
+    // Ensure there is always movement
+    if (moveX === 0 && moveY === 0) {
+      moveX = this.#speed;
+      moveY = this.#speed;
     }
 
     return { moveX, moveY };
