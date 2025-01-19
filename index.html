@@ -3,8 +3,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Configuration de base -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Importation des styles -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./index.css" />
     <link
@@ -12,6 +15,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
     <title>Système multi-agents</title>
+
+    <!-- Animation de fondu pour les modales -->
     <style>
       @keyframes fadeOut {
         from {
@@ -26,11 +31,14 @@
       }
     </style>
   </head>
+
+  <!-- Corps de la page avec flexbox -->
   <body class="flex flex-col justify-between gap-[10px]">
-    <!-- Différents boutons de l'application -->
+    <!-- Section des contrôles -->
     <div class="flex flex-col gap-[10px] mb-[20px]">
-      <!-- Bouttons du haut -->
+      <!-- Contrôles principaux -->
       <div class="flex justify-between items-center">
+        <!-- Curseur de taille des agents -->
         <div
           class="flex flex-col gap-[5px] items-center bg-[#4d4d4d] w-[250px] py-[15px] rounded-md"
         >
@@ -48,6 +56,7 @@
           />
         </div>
 
+        <!-- Bouton de démarrage -->
         <button
           id="startButton"
           class="bg-[#b3b3b3] text-[#333333] px-[25px] h-[40px] rounded-md font-bold transition-all duration-300 hover:bg-[#cecdcd]"
@@ -55,6 +64,7 @@
           Lancer la simulation
         </button>
 
+        <!-- Curseur de vitesse des agents -->
         <div
           class="flex flex-col gap-[5px] items-center bg-[#4d4d4d] w-[250px] py-[15px] rounded-md"
         >
@@ -74,14 +84,16 @@
         </div>
       </div>
 
-      <!-- Bouttons du bas -->
+      <!-- Contrôles secondaires -->
       <div class="self-center flex items-center gap-[15px]">
+        <!-- Bouton de restauration -->
         <button
           id="restoreButton"
           class="bg-[#b3b3b3] text-[#333333] px-[25px] h-[40px] rounded-md font-bold transition-all duration-300 hover:bg-[#cecdcd]"
         >
           Restaurer
         </button>
+        <!-- Bouton pause/reprise -->
         <button
           id="pauseResumeButton"
           class="bg-[#2B7621] text-white px-[25px] h-[40px] rounded-md font-bold transition-all duration-300 hover:bg-[#226119]"
@@ -91,6 +103,7 @@
       </div>
     </div>
 
+    <!-- Modale d'infection -->
     <div
       id="modal"
       class="absolute top-0 right-0 left-0 flex justify-center hidden pointer-events-none"
@@ -106,6 +119,7 @@
       </div>
     </div>
 
+    <!-- Modale de fin de simulation -->
     <div
       id="modalFinish"
       class="absolute top-0 right-0 left-0 flex justify-center hidden"
@@ -125,9 +139,11 @@
       </div>
     </div>
 
+    <!-- Zone de canvas pour la simulation -->
     <div id="canvasParent" class="flex-1">
       <canvas id="gameCanvas" style="display: none"></canvas>
     </div>
   </body>
+  <!-- Importation du script principal -->
   <script type="module" src="scripts/index.js"></script>
 </html>
