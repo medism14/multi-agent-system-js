@@ -1,27 +1,27 @@
 /** @format */
 
 /**
- * Class representing an agent that moves around a canvas and can interact with other agents
+ * Classe représentant un agent qui se déplace sur un canvas et peut interagir avec d'autres agents
  */
 class Agent {
-  #id; // Unique identifier for each agent
-  #name; // Name of the agent
-  #state; // Current state of agent (normal or infected or virus)
-  #positionX; // X coordinate on canvas
-  #positionY; // Y coordinate on canvas
-  #canvasWidth; // Width of canvas agent moves in
-  #canvasHeight; // Height of canvas agent moves in
-  #radius; // Size of the agent
-  static #numberOfAgents = 0; // Counter for total agents created
-  static #numberOfAgentsInfected = 0; // Counter for total agents created
-  #img; // Img of the agent
-  #behaviors = [];
+  #id; // Identifiant unique pour chaque agent
+  #name; // Nom de l'agent
+  #state; // État actuel de l'agent (normal, infecté ou virus)
+  #positionX; // Coordonnée X sur le canvas
+  #positionY; // Coordonnée Y sur le canvas
+  #canvasWidth; // Largeur du canvas dans lequel l'agent se déplace
+  #canvasHeight; // Hauteur du canvas dans lequel l'agent se déplace
+  #radius; // Taille de l'agent
+  static #numberOfAgents = 0; // Compteur du nombre total d'agents créés
+  static #numberOfAgentsInfected = 0; // Compteur du nombre total d'agents infectés
+  #img; // Image de l'agent
+  #behaviors = []; // Les comportements des agents
 
   /**
-   * Create a new agent
-   * @param {number} canvasWidth - Width of canvas
-   * @param {number} canvasHeight - Height of canvas
-   * @param {number} radius - Size of agent
+   * Crée un nouvel agent
+   * @param {number} canvasWidth - Largeur du canvas
+   * @param {number} canvasHeight - Hauteur du canvas
+   * @param {number} radius - Taille de l'agent
    */
   constructor(config) {
     this.#id = ++Agent.#numberOfAgents;
@@ -33,22 +33,22 @@ class Agent {
     this.#name = config.name;
     this.#state = config.state ?? "normal";
 
-    // Load the image for the agent
+    // Charge l'image pour l'agent
     this.#img = new Image();
     this.#img.src = config.imgSrc;
 
     this.#behaviors = config.behaviors;
 
-    // Return a Promise that resolves when the image is loaded
+    // Retourne une Promise qui se résout quand l'image est chargée
     return new Promise((resolve, reject) => {
-      this.#img.onload = () => resolve(this); // Resolve with the agent instance
+      this.#img.onload = () => resolve(this); // Résout avec l'instance de l'agent
       this.#img.onerror = () => reject(new Error("Failed to load image"));
     });
   }
 
   /**
-   * Draw agent on canvas
-   * @param {CanvasRenderingContext2D} ctx - Canvas context
+   * Dessine l'agent sur le canvas
+   * @param {CanvasRenderingContext2D} ctx - Contexte du canvas
    */
   draw(ctx) {
     this.#behaviors.drawAgent.draw(
@@ -62,8 +62,8 @@ class Agent {
   }
 
   /**
-   * Check for collisions with other agents and potentially infect them
-   * @param {Agent[]} othersAgents - Array of other agents to check collisions with
+   * Vérifie les collisions avec d'autres agents et les infecte potentiellement
+   * @param {Agent[]} othersAgents - Tableau des autres agents à vérifier pour les collisions
    */
   isColliding(othersAgents) {
     othersAgents.forEach((agent) => {
@@ -88,7 +88,7 @@ class Agent {
   }
 
   /**
-   * Change agent state to infected
+   * Change l'état de l'agent à infecté
    */
   infectAgent() {
     this.#state = "infected";
@@ -100,12 +100,12 @@ class Agent {
   }
 
   /**
-   * Calculate next movement based on current direction and canvas boundaries
-   * @returns {Object} Object containing X and Y movement values
+   * Calcule le prochain mouvement en fonction de la direction actuelle et des limites du canvas
+   * @returns {Object} Objet contenant les valeurs de déplacement X et Y
    */
 
   /**
-   * Update agent position based on movement direction
+   * Met à jour la position de l'agent en fonction de la direction du mouvement
    */
 
   run(last) {
@@ -130,9 +130,9 @@ class Agent {
   }
 
   /**
-   * Generate random X coordinate within canvas bounds
-   * @param {number} canvasWidth - Width of canvas
-   * @returns {number} Random X coordinate
+   * Génère une coordonnée X aléatoire dans les limites du canvas
+   * @param {number} canvasWidth - Largeur du canvas
+   * @returns {number} Coordonnée X aléatoire
    */
   getRandomX() {
     let randomValue = Math.random() * this.#canvasWidth;
@@ -144,9 +144,9 @@ class Agent {
   }
 
   /**
-   * Generate random Y coordinate within canvas bounds
-   * @param {number} canvasHeight - Height of canvas
-   * @returns {number} Random Y coordinate
+   * Génère une coordonnée Y aléatoire dans les limites du canvas
+   * @param {number} canvasHeight - Hauteur du canvas
+   * @returns {number} Coordonnée Y aléatoire
    */
   getRandomY() {
     let randomValue = Math.random() * this.#canvasHeight;
@@ -215,7 +215,7 @@ class Agent {
     this.#radius = newRadius;
   }
 
-  // Additional Getters
+  // Getters additionnels
   get numberOfAgents() {
     return Agent.#numberOfAgents;
   }

@@ -1,6 +1,18 @@
 /** @format */
 
+/**
+ * Classe pour dessiner une personne sur le canvas
+ */
 class DrawPerson {
+  /**
+   * Dessine la personne sur le canvas
+   * @param {CanvasRenderingContext2D} ctx - Le contexte du canvas
+   * @param {number} positionX - Position X de la personne
+   * @param {number} positionY - Position Y de la personne 
+   * @param {number} radius - Rayon de la personne
+   * @param {Image} img - Image de la personne
+   * @param {string} state - État de la personne (normal ou infecté)
+   */
   draw(ctx, positionX, positionY, radius, img, state) {
     ctx.save();
     ctx.beginPath();

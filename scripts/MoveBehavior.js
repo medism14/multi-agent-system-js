@@ -1,12 +1,15 @@
 /** @format */
 
+/**
+ * Classe gérant le comportement de déplacement des agents
+ */
 class MoveBehavior {
   #directions = [
     "top",
-    "top-left",
+    "top-left", 
     "left",
     "bottom-left",
-    "bottom",
+    "bottom", 
     "bottom-right",
     "right",
     "top-right",
@@ -15,6 +18,11 @@ class MoveBehavior {
   #moveDirection;
   #speed = 5;
 
+  /**
+   * Crée un nouveau comportement de déplacement
+   * @param {number} speed - Vitesse de déplacement
+   * @param {string[]} directions - Tableau des directions possibles
+   */
   constructor(speed, directions) {
     this.#speed = speed;
     this.#directions = directions;
@@ -22,13 +30,22 @@ class MoveBehavior {
     this.#moveDirection = this.#directions[random];
   }
 
+  /**
+   * Calcule le prochain déplacement aléatoire en tenant compte des limites du canvas
+   * @param {number} positionX - Position X actuelle
+   * @param {number} positionY - Position Y actuelle  
+   * @param {number} radius - Rayon de l'agent
+   * @param {number} canvasWidth - Largeur du canvas
+   * @param {number} canvasHeight - Hauteur du canvas
+   * @returns {Object} Déplacement en X et Y
+   */
   getRandomMove(positionX, positionY, radius, canvasWidth, canvasHeight,) {
     let moveX = 0;
     let moveY = 0;
     let randomBorderChangeDirection = Math.floor(Math.random() * 4) + 6;
     let directionChange = "";
 
-    // Check if we should change direction
+    // Vérifie s'il faut changer de direction
     if (this.#directionIteration <= 0) {
       let randomValue = Math.floor(Math.random() * 4) + 6;
       this.#directionIteration = randomValue;
@@ -41,7 +58,7 @@ class MoveBehavior {
       this.#directionIteration--;
     }
 
-    // Calculate movement based on direction and boundaries
+    // Calcule le mouvement selon la direction et les limites
     switch (this.#moveDirection) {
       case "top":
         if (positionY <= radius + this.#speed * 2) {
@@ -176,7 +193,7 @@ class MoveBehavior {
         break;
     }
 
-    // Ensure there is always movement
+    // S'assure qu'il y a toujours un mouvement
     if (moveX === 0 && moveY === 0) {
       moveX = this.#speed;
       moveY = this.#speed;

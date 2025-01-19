@@ -5,11 +5,11 @@ import DrawPerson from "./DrawPerson.js";
 import DrawVirus from "./DrawVirus.js";
 
 /**
- * Calculates a value between min and max based on a percentage
- * @param {number} min - Minimum value
- * @param {number} max - Maximum value
- * @param {number} percentage - Percentage between 1-100
- * @returns {number} Calculated value
+ * Calcule une valeur entre min et max basée sur un pourcentage
+ * @param {number} min - Valeur minimum
+ * @param {number} max - Valeur maximum 
+ * @param {number} percentage - Pourcentage entre 1-100
+ * @returns {number} Valeur calculée
  */
 const calculConversion = (min, max, percentage) => {
   return min + ((percentage - 1) / (100 - 1)) * (max - min);
@@ -41,7 +41,7 @@ const agentsNameAndImages = {
   "Paul-Antoine": "../images/VINCIGUERRA.png",
 };
 
-// Get DOM elements for buttons
+// Récupération des éléments DOM
 const startButton = document.getElementById("startButton");
 const restoreButton = document.getElementById("restoreButton");
 const pauseResumeButton = document.getElementById("pauseResumeButton");
@@ -53,31 +53,31 @@ const infectionMessage = document.getElementById("infectionMessage");
 const modalFinish = document.getElementById("modalFinish");
 let timeoutInfectionMessage;
 
-// Get canvas elements and set up context
+// Récupération des éléments du canvas et configuration du contexte
 const canvasParent = document.getElementById("canvasParent");
 const gameCanvas = document.getElementById("gameCanvas");
 const canvasWidth = canvasParent.clientWidth;
 const canvasHeight = canvasParent.clientHeight;
 const ctx = gameCanvas.getContext("2d");
 
-// Initialize state variables
+// Initialisation des variables d'état
 let intervalAnimation = null;
-var agents = [];
 let actualState = null;
+var agents = [];
 var virus = [];
 
-// Constants for agent size and speed ranges
+// Constantes pour les plages de taille et de vitesse des agents
 const minSize = 5;
 const maxSize = 35;
 const minSpeed = 100;
 const maxSpeed = 20;
 
-// Initialize size and speed based on slider values
+// Initialisation de la taille et de la vitesse basées sur les valeurs des curseurs
 let size = calculConversion(minSize, maxSize, sizeButton.value);
 let speed = calculConversion(minSpeed, maxSpeed, speedButton.value);
 
 /**
- * Initialize canvas dimensions and display
+ * Initialise les dimensions du canvas et son affichage
  */
 const InitCanvas = () => {
   gameCanvas.width = canvasWidth;
@@ -87,13 +87,13 @@ const InitCanvas = () => {
 
 InitCanvas();
 
-//// Event Listeners
-// Function to hide the modal
+//// Écouteurs d'événements
+// Fonction pour masquer la modal
 const hideModal = () => {
   modal.classList.add("fade-out");
 };
 
-// Function to display the modal
+// Fonction pour afficher la modal
 const displayModal = () => {
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
@@ -101,19 +101,19 @@ const displayModal = () => {
   modal.classList.remove("fade-out");
 };
 
-// Function to display the modalFinish
+// Fonction pour afficher la modalFinish
 const displayModalFinish = () => {
   modalFinish.classList.remove("hidden");
   modalFinish.classList.remove("fade-out");
 };
 
-// Function to display the modalFinish
+// Fonction pour masquer la modalFinish
 const hideModalFinish = () => {
   modalFinish.classList.add("hidden");
   modalFinish.classList.add("fade-out");
 };
 
-// Event for infect agent
+// Événement pour l'infection d'un agent
 document.addEventListener("agentInfected", (event) => {
   const infectedName = event.detail;
   infectionMessage.textContent = `${infectedName}`;
@@ -137,7 +137,7 @@ document.addEventListener("finishSimulation", () => {
 });
 
 /**
- * Start animation when start button clicked, if not paused
+ * Démarre l'animation quand le bouton start est cliqué, si non en pause
  */
 startButton.addEventListener("click", () => {
   if (actualState != "pause") {
@@ -146,7 +146,7 @@ startButton.addEventListener("click", () => {
 });
 
 /**
- * Reset simulation when restore button clicked
+ * Réinitialise la simulation quand le bouton restore est cliqué
  */
 restoreButton.addEventListener("click", () => {
   restore();
@@ -158,7 +158,7 @@ restartButton.addEventListener("click", () => {
 });
 
 /**
- * Toggle between pause/resume when button clicked
+ * Bascule entre pause/reprise quand le bouton est cliqué
  */
 pauseResumeButton.addEventListener("click", () => {
   if (actualState == "run") {
@@ -169,7 +169,7 @@ pauseResumeButton.addEventListener("click", () => {
 });
 
 /**
- * Update agent sizes when size slider changes
+ * Met à jour la taille des agents quand le curseur de taille change
  */
 sizeButton.addEventListener("input", (event) => {
   if (agents.length > 0) {
@@ -180,7 +180,7 @@ sizeButton.addEventListener("input", (event) => {
 });
 
 /**
- * Update animation speed when speed slider changes
+ * Met à jour la vitesse d'animation quand le curseur de vitesse change
  */
 speedButton.addEventListener("input", (event) => {
   speed =
@@ -192,8 +192,8 @@ speedButton.addEventListener("input", (event) => {
 });
 
 /**
- * Update the size of all agents
- * @param {number} size - New radius for agents
+ * Met à jour la taille de tous les agents
+ * @param {number} size - Nouveau rayon pour les agents
  */
 const changeSize = (size) => {
   if (actualState == "run") {
@@ -213,7 +213,7 @@ const changeSize = (size) => {
 };
 
 /**
- * Create initial environment with 50 agents, one infected
+ * Crée l'environnement initial avec tous les agents
  */
 const createEnvironnement = async () => {
   const agentsArray = Object.entries(agentsNameAndImages);
@@ -285,7 +285,7 @@ document.addEventListener("removeVirus", (event) => {
 });
 
 /**
- * Animation loop - updates and redraws all agents
+ * Boucle d'animation - met à jour et redessine tous les agents
  */
 const animateEnvironments = (last) => {
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -305,7 +305,7 @@ const animateEnvironments = (last) => {
 };
 
 /**
- * Start the animation loop
+ * Démarre la boucle d'animation
  */
 const runAnimation = () => {
   actualState = "run";
@@ -317,20 +317,21 @@ const runAnimation = () => {
 };
 
 /**
- * Reset the simulation to initial state
+ * Réinitialise la simulation à l'état initial
  */
 const restore = () => {
-  // Clear the canvas and animations
+  // Efface le canvas et les animations
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   clearInterval(intervalAnimation);
   intervalAnimation = null;
 
-  // Reset state variables
+  // Réinitialise les variables d'état
   agents.length = 0;
+  virus.length = 0;
   actualState = null;
   Agent.restoreAgent();
 
-  // Reset pause button appearance
+  // Réinitialise l'apparence du bouton pause
   pauseResumeButton.textContent = "Mettre en pause";
   pauseResumeButton.classList.remove(
     "text-white",
@@ -338,14 +339,14 @@ const restore = () => {
     "hover:bg-[#205992]"
   );
 
-  // Create new environment
+  // Crée un nouvel environnement
   setTimeout(() => {
     createEnvironnement();
   }, 50);
 };
 
 /**
- * Pause the animation
+ * Met l'animation en pause
  */
 const pause = () => {
   clearInterval(intervalAnimation);
@@ -360,7 +361,7 @@ const pause = () => {
 };
 
 /**
- * Resume the animation
+ * Reprend l'animation
  */
 const resume = () => {
   runAnimation();

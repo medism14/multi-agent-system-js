@@ -1,6 +1,17 @@
 /** @format */
 
+/**
+ * Classe pour dessiner un virus sur le canvas
+ */
 class DrawVirus {
+  /**
+   * Dessine le virus sur le canvas
+   * @param {CanvasRenderingContext2D} ctx - Le contexte du canvas
+   * @param {number} positionX - Position X du virus
+   * @param {number} positionY - Position Y du virus
+   * @param {number} radius - Rayon du virus
+   * @param {HTMLImageElement} img - Image du virus
+   */
   draw(ctx, positionX, positionY, radius, img) {
     ctx.save();
     ctx.beginPath();
