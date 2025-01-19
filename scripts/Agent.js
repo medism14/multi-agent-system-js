@@ -93,10 +93,8 @@ class Agent {
   infectAgent() {
     this.#state = "infected";
     Agent.#numberOfAgentsInfected++;
-    if (this.#name != "Ismael") {
-      const event = new CustomEvent("agentInfected", { detail: this.#name });
-      document.dispatchEvent(event);
-    }
+    const event = new CustomEvent("agentInfected", { detail: this.#name });
+    document.dispatchEvent(event);
   }
 
   /**
